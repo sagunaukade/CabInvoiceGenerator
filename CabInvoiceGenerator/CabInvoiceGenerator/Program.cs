@@ -11,6 +11,8 @@ namespace CabInvoiceGenerator
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to the Cab Invoice Generator");
+            CabInvoiceGenerator cabInvoiceGenerator = new CabInvoiceGenerator(RideType.NORMAL);
+            Console.WriteLine(cabInvoiceGenerator.CalculateFare(10, 15));
             Console.ReadLine();
         }
     }
