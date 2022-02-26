@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using CabInvoiceGenerator;
+using System.Collections.Generic;
 
 namespace CabInvoiceGenerator
 {
@@ -54,6 +55,74 @@ namespace CabInvoiceGenerator
             Ride[] cabRides = { };
             var nullRidesException = Assert.ThrowsException<CabInvoiceException>(() => generateNormalFare.CalculateAgreegateFare(cabRides));
             Assert.AreEqual(CabInvoiceException.ExceptionType.NULL_RIDES, nullRidesException.exceptionType);
+        }
+    }
+    //Test for returning invoice service when queried by UserId(UC5-TC-5.1)
+    [TestMethod]
+    public void GivenUserIdInvoiceServiceShouldReturnListOfRides()
+    {
+        Ride[] rides =
+        {
+                new Ride(1.0, 1),
+                new Ride(2.0, 2),
+                new Ride(3.0, 2),
+                
+            };
+        string userId = "12345";
+        RideRepository rideRepository = new RideRepository();
+        rideRepository.AddRide(userId, rides);
+        Ride[] actual = rideRepository.GetRides(userId);
+        Assert.AreEqual(rides, actual);
+    }
+    // UC5 Return the total fare for premium ride
+    [TestMethod]
+    [TestCategory("CalculatingFare")]
+    public void ReturnTotalFareForPremiumRide()
+    {
+
+        CabInvoiceGenerator invoice = new CabInvoiceGenerator(RideType.PREMIUM_RIDE);
+        double distance = 15.0;
+        int time = 12;
+        double fare = invoice.CalculateFare(distance, time);
+        double expected = 237.0;
+        Assert.AreEqual(expected, fare);
+    }
+    // UC1 & UC5-Handling the custom exception if distance is negative number or zero.
+    [TestMethod]
+    [TestCategory("CalculatingFare")]
+    public void ReturnTotalFareForRideInvalidDistance()
+    {
+        string expected = "Distance should be positive integer";
+        try
+        {
+            CabInvoiceGenerator invoice = new CabInvoiceGenerator(RideType.PREMIUM_RIDE);
+            double distance = -15;
+            int time = 12;
+            double fare = invoice.CalculateFare(distance, time);
+
+        }
+        catch (CustomException ex)
+        {
+            Assert.AreEqual(expected, ex.message);
+        }
+    }
+    // UC1 & UC5-Handling the custom exception if time is negative number or zero.
+    [TestMethod]
+    [TestCategory("CalculatingFare")]
+    public void ReturnTotalFareForRideInvalidTime()
+    {
+        string expected = "Time should be positive integer";
+        try
+        {
+            CabInvoiceGenerator invoice = new CabInvoiceGenerator(RideType.NORMAL_RIDE);
+            double distance = 10;
+            int time = 0;
+            double fare = invoice.CalculateFare(distance, time);
+
+        }
+        catch (CustomException ex)
+        {
+            Assert.AreEqual(expected, ex.message);
         }
     }
 }
