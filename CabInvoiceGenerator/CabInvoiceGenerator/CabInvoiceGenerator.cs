@@ -43,16 +43,18 @@ namespace CabInvoiceGenerator
                 throw ex;
             }
         }
-        //  Method to calculate fare for multiple rides UC2
-        public double CalculateAgreegateFare(Ride[] rides)
+        // Method to calculate aggregate fare for multiple rides and return Invoice summary UC2
+        public InvoiceSummary CalculateAgreegateFare(Ride[] rides)
         {
             double totalFare = 0;
             if (rides.Length == 0)
-                throw new CabInvoiceGeneratorException(CabInvoiceGeneratorException.ExceptionType.NULL_RIDES, "No Rides Found");
+                throw new CabInvoiceException(CabInvoiceException.ExceptionType.NULL_RIDES, "No Rides Found");
             foreach (var ride in rides)
+            {
                 totalFare += CalculateFare(ride.time, ride.distance);
-            double aggregateFare = Math.Max(totalFare, MINIMUM_FARE);
-            return aggregateFare;
+            }
+            //double agreegateFare = Math.Max(totalFare, MINIMUM_FARE);
+            return new InvoiceSummary(rides.Length, totalFare);
         }
     }
 }
